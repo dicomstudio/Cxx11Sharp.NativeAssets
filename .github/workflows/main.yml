@@ -1,1 +1,44 @@
+---
+# Automatic building in CI
 
+name: Compile and Publish
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+jobs:
+  linux-amd64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build
+        run: |
+          cmake -S . -B build
+          cmake --build build --config Release
+          cmake --install build --prefix target/x86_64-unknown-linux-gnu
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.job }}
+          path: target/x86_64-unknown-linux-gnu/lib/libcxx11sharp.so
+          retention-days: 1
+
+  windows-amd64:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build
+        run: |
+          cmake -S . -B build
+          cmake --build build --config Release
+          cmake --install build --prefix target/x86_64-pc-windows-msvc
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.job }}
+          path: target/x86_64-pc-windows-msvc/toto/cxx11sharp.dll
+          retention-days: 1
