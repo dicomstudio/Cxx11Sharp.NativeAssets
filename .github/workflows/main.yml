@@ -8,6 +8,11 @@ on:
   pull_request:
     branches:
       - main
+      
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   linux-amd64:
     runs-on: ubuntu-latest
@@ -23,7 +28,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.job }}
-          path: target/x86_64-unknown-linux-gnu/lib/libcxx11sharp.so
+          path: target/x86_64-unknown-linux-gnu/lib/libCxx11Sharp.so
           retention-days: 1
 
   windows-amd64:
@@ -40,5 +45,26 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ github.job }}
-          path: target/x86_64-pc-windows-msvc/toto/cxx11sharp.dll
+          path: target/x86_64-pc-windows-msvc/lib/Cxx11Sharp.dll
           retention-days: 1
+          
+  publish-github-release:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    needs: [linux-amd64, windows-amd64]
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          path: target
+
+      - name: Create Github Release
+        run: |          
+          # find target -type f
+          dotnet nuget add source --username dicomstudio --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/dicomstudio/index.json"
+          dotnet pack --configuration Release
+          dotnet nuget push bin/Release/DicomStudio.Cxx11Sharp.NativeAssets.0.0.1.nupkg --source "github"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Condition="'$(VisualStudioVersion)'=='16.0'">
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(VisualStudioVersion)'=='17.0'">
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <!-- Dump version for clarity -->
+  <Target Name="TestVersion" AfterTargets="build">
+    <Message Text="version is $(VisualStudioVersion)" Importance="high"/>
+  </Target>
+
+  <PropertyGroup>
+    <AssemblyName>DicomStudio.Cxx11Sharp.NativeAssets</AssemblyName>
+    <RootNamespace>DicomStudio.Cxx11Sharp.NativeAssets</RootNamespace>
+    <Nullable>enable</Nullable>
+    <Authors>DicomStudio</Authors>
+    <AssemblyVersion>0.0.1.0</AssemblyVersion>
+    <PackageVersion>0.0.1.0</PackageVersion>
+    <PackageTags>native;cxx11</PackageTags>
+    <Description>NativeLibrary for Cxx11 binding.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="target/linux-amd64/libCxx11Sharp.so" Pack="true" PackagePath="runtimes/lin-x64/native" />
+    <None Include="target/windows-amd64/Cxx11Sharp.dll" Pack="true" PackagePath="runtimes/win-x64/native" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
